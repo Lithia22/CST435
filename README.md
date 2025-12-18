@@ -21,8 +21,8 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3 python3-pip python3-venv git
 
 # Clone and setup
-git clone https://github.com/Lithia22/CST435.git
-cd CST435
+git clone https://github.com/Lithia22/CST435_Assignment_2.git
+cd CST435_Assignment_2
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -46,15 +46,15 @@ results/
 
 1. Select **"Download file"** in SSH
 2. Enter path:
-   - `/home/username/CST435/results/performance_comparison.png`
-   - `/home/username/CST435/results/performance_data/multiprocessing_results.json`
-   - `/home/username/CST435/results/performance_data/futures_results.json`
-   - `/home/username/CST435/results/output_images/740385_gray.jpg`
+   - `/home/username/CST435_Assignment_2/results/performance_comparison.png`
+   - `/home/username/CST435_Assignment_2/results/performance_data/multiprocessing_results.json`
+   - `/home/username/CST435_Assignment_2/results/performance_data/futures_results.json`
+   - `/home/username/CST435_Assignment_2/results/output_images/740385_gray.jpg`
 
 ### Download All Files (ZIP):
 
 1. Select **"Download file"** in SSH
-2. Enter: `/home/username/CST435/results.zip`
+2. Enter: `/home/username/CST435_Assignment_2/results.zip`
 
 **Note:** ZIP file is large so may take longer time to download.
 
