@@ -48,7 +48,7 @@ def calculate_speedup(results):
     if baseline_key is None:
         return speedups
     
-    baseline_time = results[str(baseline_key)]['total_time']
+    baseline_time = results[baseline_key]['total_time']
     
     for p in processes:
         key = str(p)

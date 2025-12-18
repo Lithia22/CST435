@@ -41,18 +41,18 @@ If you want to download additional images:
 1. **Setup Kaggle API** (one-time):
 
 ```bash
-   # Create account at https://www.kaggle.com
-   # Go to Settings → API → Create New Token
-   # Download kaggle.json
-   mkdir -p ~/.kaggle
-   mv ~/Downloads/kaggle.json ~/.kaggle/
-   chmod 600 ~/.kaggle/kaggle.json
+# Create account at https://www.kaggle.com
+# Go to Settings → API → Create New Token
+# Download kaggle.json
+mkdir -p ~/.kaggle
+mv ~/Downloads/kaggle.json ~/.kaggle/
+chmod 600 ~/.kaggle/kaggle.json
 ```
 
 2. **Download dataset**:
 
 ```bash
-   python download_dataset.py
+python download_dataset.py
 ```
 
 ### 4. Final Execution

@@ -45,7 +45,7 @@ def run_all():
     
     # Setup results folder
     results_dir = setup_results_folder()
-    print(f"📁 Results folder: {results_dir}")
+    print(f"Results folder: {results_dir}")
     
     # Check dataset
     dataset_path = "food101_subset"
