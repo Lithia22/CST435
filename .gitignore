@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+.Python
+venv/
+env/
+
+# User-generated outputs
+results/
+*.zip
+
+# Kaggle API tokens
+kaggle.json
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# OS
+Thumbs.db
