@@ -1,26 +1,25 @@
 import os
 import sys
-from datetime import datetime
 
 def setup_results_folder():
-    """Create results folder WITHOUT timestamp"""
+    """Create results folder structure"""
     results_dir = "results"
     
+    # Remove old results
     import shutil
     if os.path.exists(results_dir):
         shutil.rmtree(results_dir)
     
+    # Create fresh structure
     os.makedirs(os.path.join(results_dir, "performance_data"), exist_ok=True)
-    os.makedirs(os.path.join(results_dir, "output_images"), exist_ok=True) 
+    os.makedirs(os.path.join(results_dir, "output_images"), exist_ok=True)
     
-    print(f"Results folder: {results_dir}/")
     return results_dir
 
 def zip_results(results_dir):
-    """Automatically zip the results folder"""
+    """Create zip file of results"""
     import zipfile
     
-    # Simple name: results.zip
     zip_filename = "results.zip"
     
     try:
@@ -28,49 +27,50 @@ def zip_results(results_dir):
             for root, dirs, files in os.walk(results_dir):
                 for file in files:
                     file_path = os.path.join(root, file)
-                    arcname = os.path.relpath(file_path, os.path.dirname(results_dir))
+                    arcname = os.path.relpath(file_path, ".")
                     zipf.write(file_path, arcname)
         
-        print(f"Zip created: {zip_filename}")
+        print(f"Results saved to: {zip_filename}")
         return zip_filename
         
-    except Exception:
+    except Exception as e:
+        print(f"Failed to create zip: {e}")
         return None
 
 def run_all():
     """Run the complete pipeline"""
     print("=" * 60)
-    print("PARALLEL IMAGE PROCESSING")
+    print("PARALLEL IMAGE PROCESSING - CST435")
     print("=" * 60)
     
-    # Setup results folder
+    # Setup
     results_dir = setup_results_folder()
-    print(f"Results folder: {results_dir}")
     
-    # Check dataset
-    dataset_path = "food101_subset"
-    if not os.path.exists(dataset_path):
-        print(f"Dataset not found: {dataset_path}")
+    # Verify dataset
+    if not os.path.exists("food101_subset"):
+        print("Dataset not found: food101_subset/")
+        print("Please ensure the dataset folder exists with images.")
         return
     
-    # Run multiprocessing
+    # Import modules
     sys.path.append('src')
     from src.multiprocessing_impl import run_multiprocessing_experiment
-    mp_results = run_multiprocessing_experiment("food101_subset", results_dir=results_dir)
-    
-    # Run concurrent.futures
     from src.concurrent_futures_impl import run_futures_experiment
-    futures_results = run_futures_experiment("food101_subset", results_dir=results_dir)
-    
-    # Performance analysis
     from src.performance_analysis import plot_comparison
+    
+    # Run parallel implementations
+    mp_results = run_multiprocessing_experiment("food101_subset", results_dir)
+    futures_results = run_futures_experiment("food101_subset", results_dir)
+    
+    # Generate performance analysis
     plot_comparison(mp_results, futures_results, results_dir)
     
-    # Auto-zip for easy download
-    zip_file = zip_results(results_dir)
+    # Create downloadable zip
+    zip_results(results_dir)
     
-    if zip_file:
-        print(f"\nDownload from GCP: {zip_file}")
+    print("\n" + "=" * 60)
+    print("PROCESSING COMPLETE")
+    print("=" * 60)
 
 if __name__ == "__main__":
     run_all()

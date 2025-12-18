@@ -88,8 +88,14 @@ def plot_comparison(mp_results, futures_results, results_dir="results"):
     
     # Get process counts
     all_processes = set()
-    for d in [mp_speedups, futures_speedups]:
-        all_processes.update(d.keys())
+    if mp_speedups:
+        all_processes.update(mp_speedups.keys())
+    if futures_speedups:
+        all_processes.update(futures_speedups.keys())
+    
+    if not all_processes:
+        print("No process data available for plotting.")
+        return
     
     processes = sorted(all_processes)
     
@@ -165,38 +171,48 @@ def plot_comparison(mp_results, futures_results, results_dir="results"):
     ax4.axis('tight')
     ax4.axis('off')
     
-    table_data = []
-    headers = ['Proc', 'MP Time(s)', 'Fut Time(s)', 'MP Speedup', 'Fut Speedup', 'MP Eff', 'Fut Eff']
-    
-    for i, p in enumerate(processes):
-        row = [
-            str(p),
-            f"{mp_times[i]:.2f}",
-            f"{futures_times[i]:.2f}",
-            f"{mp_speedup_vals[i]:.2f}",
-            f"{futures_speedup_vals[i]:.2f}",
-            f"{mp_eff_vals[i]:.2f}",
-            f"{futures_eff_vals[i]:.2f}"
-        ]
-        table_data.append(row)
-    
-    table = ax4.table(cellText=table_data, colLabels=headers, 
-                     cellLoc='center', loc='center')
-    table.auto_set_font_size(False)
-    table.set_fontsize(9)
-    table.scale(1, 1.8)
+    if processes and len(processes) > 0:
+        table_data = []
+        headers = ['Proc', 'MP Time(s)', 'Fut Time(s)', 'MP Speedup', 'Fut Speedup', 'MP Eff', 'Fut Eff']
+        
+        for i, p in enumerate(processes):
+            row = [
+                str(p),
+                f"{mp_times[i]:.2f}",
+                f"{futures_times[i]:.2f}",
+                f"{mp_speedup_vals[i]:.2f}",
+                f"{futures_speedup_vals[i]:.2f}",
+                f"{mp_eff_vals[i]:.2f}",
+                f"{futures_eff_vals[i]:.2f}"
+            ]
+            table_data.append(row)
+        
+        if table_data:
+            table = ax4.table(cellText=table_data, colLabels=headers, 
+                            cellLoc='center', loc='center')
+            table.auto_set_font_size(False)
+            table.set_fontsize(9)
+            table.scale(1, 1.8)
+        else:
+            ax4.text(0.5, 0.5, 'No table data available', 
+                    ha='center', va='center', transform=ax4.transAxes, fontsize=12)
+            ax4.set_title('Performance Summary', fontsize=14, fontweight='bold')
+    else:
+        ax4.text(0.5, 0.5, 'No process data for table', 
+                ha='center', va='center', transform=ax4.transAxes, fontsize=12)
     
     plt.suptitle('Parallel Image Processing Performance Analysis', 
                 fontsize=16, fontweight='bold', y=0.98)
     plt.tight_layout(rect=[0, 0, 1, 0.96])
-
+    
     # Save figure to results folder
+    plt.savefig(os.path.join(results_dir, 'performance_comparison.png'), 
+                dpi=300, bbox_inches='tight')
+    
+    # Save JSON results
     perf_dir = os.path.join(results_dir, "performance_data")
     os.makedirs(perf_dir, exist_ok=True)
     
-    plt.savefig(os.path.join(results_dir, 'performance_comparison.png'), dpi=300, bbox_inches='tight')
-    
-    # Save JSON results
     import json
     with open(os.path.join(perf_dir, 'multiprocessing_results.json'), 'w') as f:
         json.dump(mp_results, f, indent=2)
