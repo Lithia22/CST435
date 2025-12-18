@@ -6,20 +6,19 @@ from image_filters import ImageProcessor
 from pathlib import Path
 import multiprocessing
 
-def process_single_image_futures(args):
+def process_single_image_futures(image_path):
     """Process a single image with all filters"""
-    image_path, output_dir = args
     try:
         processing_time = ImageProcessor.apply_all_filters(
             image_path, 
-            output_dir=output_dir
+            output_dir="results/output_images"
         )
         return processing_time
     except Exception as e:
         print(f"Error processing {image_path}: {e}")
         return 0
 
-def futures_pipeline(image_folder, num_workers=None, results_dir="results"):
+def futures_pipeline(image_folder, num_workers=None):
     """
     Process all images using concurrent.futures ProcessPoolExecutor
     """
@@ -28,30 +27,26 @@ def futures_pipeline(image_folder, num_workers=None, results_dir="results"):
     image_paths = []
     
     for ext in image_extensions:
-        image_paths.extend(glob.glob(os.path.join(image_folder, ext)))
+        image_paths.extend(glob.glob(os.path.join(image_folder, '**', ext), recursive=True))
     
     print(f"Found {len(image_paths)} images to process")
     
-    # Set number of workers
+    # Set number of workers (default to CPU count)
     if num_workers is None:
         num_workers = multiprocessing.cpu_count()
     
-    # Create output directory inside results folder
-    output_dir = os.path.join(results_dir, "output_images")
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    # Create output directory
+    Path("results/output_images").mkdir(parents=True, exist_ok=True)
     
     # Start timing
     start_time = time.time()
-    
-    # Create list of (image_path, output_dir) tuples
-    image_args = [(img_path, output_dir) for img_path in image_paths]
     
     # Use ProcessPoolExecutor for parallel processing
     with concurrent.futures.ProcessPoolExecutor(max_workers=num_workers) as executor:
         # Submit all tasks
         future_to_image = {
-            executor.submit(process_single_image_futures, args): args[0] 
-            for args in image_args
+            executor.submit(process_single_image_futures, img_path): img_path 
+            for img_path in image_paths
         }
         
         # Collect results as they complete
@@ -86,7 +81,7 @@ def futures_pipeline(image_folder, num_workers=None, results_dir="results"):
         'processing_times': results
     }
 
-def run_futures_experiment(image_folder, worker_counts=None, results_dir="results"):
+def run_futures_experiment(image_folder, worker_counts=None):
     """
     Run concurrent.futures with different worker counts
     """
@@ -100,18 +95,26 @@ def run_futures_experiment(image_folder, worker_counts=None, results_dir="result
         print(f"Running with {num_workers} workers...")
         print('='*50)
         
-        result = futures_pipeline(image_folder, num_workers, results_dir)
+        result = futures_pipeline(image_folder, num_workers)
         results[num_workers] = result
         
         # Small delay between runs
-        time.sleep(1)
+        time.sleep(2)
     
     return results
 
 if __name__ == "__main__":
-    # Test standalone
+    # Test with your dataset
     dataset_path = "food101_subset"
+    
     if os.path.exists(dataset_path):
         results = run_futures_experiment(dataset_path)
+        
+        # Save results for later analysis
+        import json
+        Path("results/performance_data").mkdir(parents=True, exist_ok=True)
+        with open('results/performance_data/futures_results.json', 'w') as f:
+            json.dump(results, f, indent=2)
+        print("Results saved to: results/performance_data/futures_results.json")
     else:
         print(f"Dataset path '{dataset_path}' not found!")

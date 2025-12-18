@@ -1,8 +1,6 @@
 import cv2
 import numpy as np
 from PIL import Image, ImageFilter, ImageEnhance
-import os
-from pathlib import Path
 
 class ImageProcessor:
     @staticmethod
@@ -86,7 +84,6 @@ class ImageProcessor:
         Returns processing time
         """
         import time
-        from pathlib import Path
         
         start_time = time.time()
         
@@ -99,18 +96,21 @@ class ImageProcessor:
         
         # Save results
         if output_dir:
+            import os
+            from pathlib import Path
+            
             # Create output directory
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            Path(output_dir).mkdir(exist_ok=True)
             
-            # Get original filename without extension
-            original_filename = Path(image_path).stem  # Gets "food_image" from "food_image.jpg"
+            # Get filename without extension
+            filename = Path(image_path).stem
             
-            # Save each filtered image with original name + filter suffix
-            cv2.imwrite(f"{output_dir}/{original_filename}_gray.jpg", gray)
-            cv2.imwrite(f"{output_dir}/{original_filename}_blurred.jpg", blurred)
-            cv2.imwrite(f"{output_dir}/{original_filename}_edges.jpg", edges)
-            cv2.imwrite(f"{output_dir}/{original_filename}_sharpened.jpg", sharpened)
-            cv2.imwrite(f"{output_dir}/{original_filename}_brightened.jpg", brightened)
+            # Save each filtered image
+            cv2.imwrite(f"{output_dir}/{filename}_gray.jpg", gray)
+            cv2.imwrite(f"{output_dir}/{filename}_blurred.jpg", blurred)
+            cv2.imwrite(f"{output_dir}/{filename}_edges.jpg", edges)
+            cv2.imwrite(f"{output_dir}/{filename}_sharpened.jpg", sharpened)
+            cv2.imwrite(f"{output_dir}/{filename}_brightened.jpg", brightened)
         
         end_time = time.time()
         return end_time - start_time
