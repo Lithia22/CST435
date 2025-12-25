@@ -37,6 +37,26 @@ def zip_results(results_dir):
         print(f"Failed to create zip: {e}")
         return None
 
+def save_json_results(mp_results, futures_results):
+    """Save performance results as JSON files for analysis."""
+    import json
+    
+    # Create performance_data directory
+    os.makedirs(os.path.join("results", "performance_data"), exist_ok=True)
+    
+    # Save multiprocessing results
+    mp_path = os.path.join("results", "performance_data", "multiprocessing_results.json")
+    with open(mp_path, 'w') as f:
+        json.dump(mp_results, f, indent=2)
+    
+    # Save concurrent.futures results
+    futures_path = os.path.join("results", "performance_data", "futures_results.json")
+    with open(futures_path, 'w') as f:
+        json.dump(futures_results, f, indent=2)
+    
+    print(f"JSON results saved to: {mp_path}")
+    print(f"JSON results saved to: {futures_path}")
+
 def run_all():
     """Run the complete parallel image processing pipeline."""
     print("=" * 60)
@@ -77,6 +97,9 @@ def run_all():
     print("=" * 60)
     # Generate plots and tables comparing execution time, speedup, and efficiency
     plot_comparison(mp_results, futures_results)
+    
+    # Save results as JSON files
+    save_json_results(mp_results, futures_results)
     
     # ---------------- STEP 4: Create downloadable zip ---------------- #
     print("\n" + "=" * 60)
